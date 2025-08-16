@@ -1,0 +1,28 @@
+/*
+Ejercicio 7 - Sistemas Embebidos 1
+Integrantes: Fabian polo , Jose Torres, Oscar pallares
+Compilador usado: OnlineGDB (online)
+Descripción: En una variable llamada NUMERO está en binario el valor del número hexadecimal CAFE. Realizar un desplazamiento de bits a la izquierda e imprimir en pantalla el valor tanto en binario como en hexadecimal.
+
+ */
+
+#include <stdio.h>
+
+int main(void) {
+    unsigned int NUMERO = 0b1100101011111110; // CAFE en binario
+
+    // Desplazamiento de bits a la izquierda (1 posición)
+    unsigned int desplazado = NUMERO << 1;
+
+    // Imprimir en binario
+    printf("Binario: ");
+    for (int i = sizeof(desplazado) * 8 - 1; i >= 0; i--) {
+        printf("%d", (desplazado >> i) & 1);
+    }
+    printf("\n");
+
+    // Imprimir en hexadecimal
+    printf("Hexadecimal: %X\n", desplazado);
+
+    return 0;
+}

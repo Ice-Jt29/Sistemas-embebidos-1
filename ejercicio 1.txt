@@ -1,0 +1,26 @@
+/*
+Ejercicio 1 - Sistemas Embebidos 1
+Integrantes: Fabian polo , Jose Torres, Oscar pallares
+Compilador usado: one compiler
+Descripción:
+Calcular la raíz cuadrada de un número positivo usando el método de Newton,
+sin usar librerías matemáticas. Mostrar el resultado en formato tipo diccionario.
+*/
+
+#include <stdio.h>
+
+float raiz_newton(int n, int iteraciones) {
+  float x = n / 2.0;  // Aproximación inicial
+    for (int i = 0; i < iteraciones; i++) {
+        x = 0.5 * (x + (double)n / x);
+    }
+    return x;
+}
+
+int main() {
+    int NUMERO = 2;
+    double resultado = raiz_newton(NUMERO, 5);
+    printf("{'Número': %d, 'Raiz cuadrada usando Newton': %.6f}\n", NUMERO, resultado);
+    return 0;
+}
+     

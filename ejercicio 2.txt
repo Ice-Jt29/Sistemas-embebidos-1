@@ -1,0 +1,35 @@
+/*
+Ejercicio 2 - Sistemas Embebidos 1
+Integrantes: Fabian polo , Jose Torres, Oscar pallares
+Compilador usado: one compiler
+Descripción:
+Dado un número entero de 4 dígitos (1000 a 9999), mostrar sus unidades
+de mil, centenas, decenas y unidades. Si está fuera del rango, no ejecutar.
+No se usan arreglos, vectores ni listas.
+*/
+#include <stdio.h>
+
+int main() {
+    int NUMERO = 5832;   // ejemplo
+
+    // Validar rango
+    if (NUMERO < 1000 || NUMERO > 9999) {
+        printf("El número %d está fuera del rango (1000 - 9999).\n", NUMERO);
+        return 0;
+    }
+
+    // Extraer cifras con restas
+    int unidad_mil = NUMERO / 1000;                // primer dígito
+    int resto      = NUMERO - (unidad_mil * 1000); // quitar miles
+
+    int centena    = resto / 100;                  // segundo dígito
+    resto          = resto - (centena * 100);      // quitar centenas
+
+    int decena     = resto / 10;                   // tercer dígito
+    int unidad     = resto - (decena * 10);        // último dígito
+
+    printf("'Numero': %d, 'Unidades de mil': %d, 'Centenas': %d, 'Decenas': %d, 'Unidades': %d",
+           NUMERO, unidad_mil, centena, decena, unidad);
+
+    return 0;
+}

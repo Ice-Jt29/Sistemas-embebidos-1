@@ -1,0 +1,82 @@
+/*
+/*
+Ejercicio 7 - Sistemas Embebidos 1
+Integrantes: Fabian polo , Jose Torres, Oscar pallares
+Compilador usado: OnlineGDB (online)
+Descripción:Emular el comportamiento del script "Tabla de verdad basada en número de identificación" que está en este enlace (clic aquí).
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Función que convierte un número a binario y lo guarda en un arreglo de caracteres
+void decimalABinario(unsigned int numero, char binario[]) {
+    int i, j = 0;
+    char temp[33]; // hasta 32 bits + terminador nulo
+
+    if (numero == 0) {
+        binario[0] = '0';
+        binario[1] = '\0';
+        return;
+    }
+
+    // Obtener los bits en orden inverso
+    while (numero > 0) {
+        temp[j++] = (numero % 2) + '0';
+        numero /= 2;
+    }
+    temp[j] = '\0';
+
+    // Invertir el arreglo temporal para obtener el binario correcto
+    for (i = 0; i < j; i++) {
+        binario[i] = temp[j - 1 - i];
+    }
+    binario[j] = '\0';
+}
+
+int main() {
+    unsigned int numero;
+    char binario[33];
+    int bits[16];
+    int i, j;
+
+    printf("Ingrese un numero entero: ");
+    if (scanf("%u", &numero) != 1) {
+        printf("⚠️ Error: Entrada invalida.\n");
+        return 1;
+    }
+
+    // Convertir a binario usando la función propia
+    decimalABinario(numero, binario);
+
+    // Calcular longitud del binario
+    int len = 0;
+    while (binario[len] != '\0') len++;
+
+    // Llenar arreglo de bits con los primeros 16 (MSB primero)
+    for (i = 0; i < 16; i++) {
+        if (i < len) {
+            bits[i] = binario[i] - '0'; // convertir '0'/'1' a entero
+        } else {
+            bits[i] = 0; // completar con ceros
+        }
+    }
+
+    // Mostrar resultados
+    printf("\nNumero ingresado: %u\n", numero);
+    printf("Binario: %s\n", binario);
+
+    printf("\nTabla de verdad (4 entradas y 1 salida Q):\n");
+    printf("X1 X2 X3 X4 | Q\n");
+    printf("------------+--\n");
+
+    for (i = 0; i < 16; i++) {
+        // generar combinacion de entradas (i en binario de 4 bits)
+        for (j = 3; j >= 0; j--) {
+            printf("%d ", (i >> j) & 1);
+        }
+        printf(" | %d\n", bits[i]);
+    }
+
+    return 0;
+}

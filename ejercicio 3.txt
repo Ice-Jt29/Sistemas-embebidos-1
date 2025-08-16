@@ -1,0 +1,30 @@
+*
+
+
+Ejercicio 3 - Sistemas Embebidos 1
+Integrantes: Fabian polo , Jose Torres, Oscar pallares
+Compilador usado: OnlineGDB (online)
+Descripción: Desarrollar un programa que calcule y muestre en pantalla la suma de los números enteros pares almacenados en un rango de números enteros definido por variables llamadas INICIO y FIN. Se debe verificar que INICIO es mayor que 0 y que FIN sea mayor que INICIO, en caso que no se cumpla una de esas, no se debe mostrar nada en pantalla. Resultado esperado en pantalla:
+    
+
+ */
+#include <stdio.h>
+
+int main(void) {
+    int INICIO, FIN;
+    int SUMATORIA = 0;
+
+    if (scanf("%d", &INICIO) != 1) return 0;
+    if (scanf("%d", &FIN) != 1) return 0;
+
+    if (INICIO > 0 && FIN > INICIO) {
+        int i = (INICIO % 2 == 0) ? INICIO : INICIO + 1;
+        for (; i <= FIN; i += 2) {
+            SUMATORIA += i;
+        }
+        printf("{'Número de inicio' : %d, 'Número de fin' : %d, 'Sumatoria' : %d}\n", INICIO, FIN, SUMATORIA);
+    }
+    // No se muestra nada si la condición no se cumple
+
+    return 0;
+}

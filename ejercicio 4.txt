@@ -1,0 +1,38 @@
+/*
+Ejercicio 4 - Sistemas Embebidos 1
+Integrantes: Fabian polo , Jose Torres, Oscar pallares
+Compilador usado: OnlineGDB (online)
+Descripción:
+    Calcular la sumatoria y la productoria de los números enteros en el rango
+    [INICIO, FIN]. Solo se debe imprimir resultado si FIN > INICIO.
+  */
+#include <stdio.h>
+
+int main() {
+    int inicio, fin;
+    long long sumatoria = 0;
+    long long productoria = 1;
+
+    // Pedir valores al usuario
+    printf("Ingrese el valor de INICIO: ");
+    scanf("%d", &inicio);
+
+    printf("Ingrese el valor de FIN: ");
+    scanf("%d", &fin);
+
+    // Validar condición
+    if (fin > inicio) {
+        // Calcular sumatoria y productoria
+        for (int i = inicio; i <= fin; i++) {
+            sumatoria += i;
+            productoria *= i;
+        }
+
+        // Mostrar resultados
+        printf("Sumatoria = %lld\n", sumatoria);
+        printf("Productoria = %lld\n", productoria);
+    }
+    // Si fin <= inicio, no se muestra nada
+
+    return 0;
+}
