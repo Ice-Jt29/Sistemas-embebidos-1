@@ -1,5 +1,7 @@
 Integrantes 
 
 Jose luis Torres
-Fabian polo 
+
+Fabian polo
+
 Oscar pallares
