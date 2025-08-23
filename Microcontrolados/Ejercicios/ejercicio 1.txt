@@ -10,17 +10,28 @@ sin usar librerías matemáticas. Mostrar el resultado en formato tipo diccionario
 #include <stdio.h>
 
 float raiz_newton(int n, int iteraciones) {
-  float x = n / 2.0;  // Aproximación inicial
+    if (n < 0) {
+        printf("Error: No se puede calcular la raíz cuadrada de un número negativo.\n");
+        return -1;  // Indicador de error
+    }
+
+    if (n == 0) {
+        return 0; // Caso especial
+    }
+
+    float x = n / 2.0;  // Aproximación inicial
     for (int i = 0; i < iteraciones; i++) {
-        x = 0.5 * (x + (double)n / x);
+        x = 0.5 * (x + (float)n / x);
     }
     return x;
 }
 
 int main() {
-    int NUMERO = 2;
-    double resultado = raiz_newton(NUMERO, 5);
-    printf("{'Número': %d, 'Raiz cuadrada usando Newton': %.6f}\n", NUMERO, resultado);
+    int NUMERO = 2;  // <-- Prueba con negativo
+    float resultado = raiz_newton(NUMERO, 5);
+
+    if (resultado != -1) { // Solo mostrar si no hubo error
+        printf("{'Número': %d, 'Raiz cuadrada usando Newton': %.6f}\n", NUMERO, resultado);
+    }
     return 0;
 }
-     
