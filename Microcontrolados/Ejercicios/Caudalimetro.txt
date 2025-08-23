@@ -1,0 +1,96 @@
+[env:esp32doit-devkit-v1]
+platform = espressif32
+board = esp32doit-devkit-v1
+framework = arduino
+/*
+Ejercicio Caudalímetro
+Integrantes: Fabian polo , Jose Torres, Oscar pallares
+Compilador usado: visual studio code,platform io
+Descripción:
+Desarrollar un programa que permita dar solución al siguiente problema:
+
+En un proyecto de telemetría se tiene un caudalímetro que envía por puerto serial cada periodo de tiempo la cantidad de caudal detectado,
+el cual es un número entero no mayor de 2 dígitos (es decir, se enviará un número entre 00 y 99)
+*/
+#include <Arduino.h>
+
+int ultimo = -1;
+int mayor = -1;
+int menor = -1;
+long suma = 0;
+int contador = 0;
+
+String leerCadena() {
+  String entrada = "";
+  while (Serial.available()) {
+    char c = Serial.read();
+    if (c == '\n') break; // Fin de línea
+    entrada += c;
+  }
+  return entrada;
+}
+
+void procesarDato(String entrada) {
+  entrada.trim(); // quitar espacios
+
+  // Validar formato: debe empezar con {'caudal': y terminar en }
+  if (!entrada.startsWith("{'caudal':") || !entrada.endsWith("}")) {
+    return; // formato inválido -> ignorar
+  }
+
+  // Extraer parte numérica
+  int inicio = entrada.indexOf(":");
+  int fin = entrada.lastIndexOf("}");
+  if (inicio == -1 || fin == -1) return;
+
+  String valorStr = entrada.substring(inicio + 1, fin);
+  valorStr.trim();
+
+  // Convertir a número
+  int valor = valorStr.toInt();
+
+  // Validar rango 0–99
+  if (valor < 0 || valor > 99) return;
+
+  // Actualizar estadísticas
+  ultimo = valor;
+  if (contador == 0) {
+    mayor = valor;
+    menor = valor;
+  } else {
+    if (valor > mayor) mayor = valor;
+    if (valor < menor) menor = valor;
+  }
+
+  suma += valor;
+  contador++;
+
+  // Calcular promedio
+  float promedio = (float)suma / contador;
+
+  // Imprimir resultado
+  Serial.print("{'último': ");
+  Serial.print(ultimo);
+  Serial.print(", 'mayor': ");
+  Serial.print(mayor);
+  Serial.print(", 'menor': ");
+  Serial.print(menor);
+  Serial.print(", 'promedio': ");
+  Serial.print(promedio, 2); // Mostrar con 2 decimales
+  Serial.println("}");
+}
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial) { ; } // esperar conexión en algunos entornos
+  Serial.println("ESP32 - Sistema de telemetría iniciado. Ingrese datos en formato {'caudal': VALOR}");
+}
+
+void loop() {
+  if (Serial.available()) {
+    String entrada = leerCadena();
+    if (entrada.length() > 0) {
+      procesarDato(entrada);
+    }
+  }
+}
