@@ -1,31 +1,73 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include <Arduino.h>
+#include <vector>
+#include <algorithm>
+using namespace std;
 
-int main() {
-    char linea[100];
-    int ultimo, mayor = -1, menor = 100, suma = 0, contador = 0;
+vector<int> valores;
 
-    while (fgets(linea, sizeof(linea), stdin)) {
-        // Buscar formato {'caudal': VALOR}
-        int valor;
-        // Intentar extraer el valor con sscanf
-        if (sscanf(linea, "{'caudal': %d}", &valor) == 1) {
-            // Validar rango 0-99
-            if (valor >= 0 && valor <= 99) {
-                ultimo = valor;
-                suma += valor;
-                contador++;
-                if (valor > mayor) mayor = valor;
-                if (valor < menor) menor = valor;
-
-                float promedio = (float)suma / contador;
-                printf("{'último': %d, 'mayor': %d, 'menor': %d, 'promedio': %.2f}\n",
-                       ultimo, mayor, menor, promedio);
-            }
-            // Si no está en rango, ignorar
-        }
-        // Si no cumple formato, ignorar
+bool esNumeroValido(const String &str) {
+    if (str.length() == 0) return false;
+    for (unsigned int i = 0; i < str.length(); i++) {
+        if (!isDigit(str[i])) return false;
     }
-    return 0;
+    return true;
+}
+
+void procesarEntrada(String input) {
+    input.trim();  // quitar espacios al inicio y final
+
+    // Buscar formato correcto: empieza con {'caudal': y termina con }
+    if (input.startsWith("{'caudal':") && input.endsWith("}")) {
+        // Extraer lo que está entre {'caudal':  y }
+        String valorStr = input.substring(10, input.length() - 1);
+        valorStr.trim();  // quitar espacios intermedios
+
+        // Validar que sea número positivo
+        if (esNumeroValido(valorStr)) {
+            int valor = valorStr.toInt();
+
+            // Rango permitido 0-99
+            if (valor >= 0 && valor <= 99) {
+                valores.push_back(valor);
+
+                int ultimo = valor;
+                int mayor = *max_element(valores.begin(), valores.end());
+                int menor = *min_element(valores.begin(), valores.end());
+
+                double suma = 0;
+                for (int v : valores) suma += v;
+                double promedio = suma / valores.size();
+
+                // Imprimir en formato requerido
+                Serial.print("{'último': ");
+                Serial.print(ultimo);
+                Serial.print(", 'mayor': ");
+                Serial.print(mayor);
+                Serial.print(", 'menor': ");
+                Serial.print(menor);
+                Serial.print(", 'promedio': ");
+                Serial.print(promedio, 2);
+                Serial.println("}");
+            }
+        }
+    }
+}
+
+void setup() {
+    Serial.begin(9600);
+    Serial.println("Ingrese datos en formato {'caudal': VALOR} (0-99). Escriba 'fin' para salir.");
+}
+
+void loop() {
+    if (Serial.available()) {
+        String input = Serial.readStringUntil('\n');
+        input.trim();
+
+        if (input.equalsIgnoreCase("fin")) {
+            Serial.println("Programa terminado.");
+            while (true) delay(1000);
+        }
+
+        procesarEntrada(input);
+    }
 }
