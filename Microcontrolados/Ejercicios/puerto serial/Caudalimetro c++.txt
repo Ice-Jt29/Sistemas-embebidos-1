@@ -1,3 +1,37 @@
+/*
+Ejercicio  - Sistemas Embebidos 1
+Integrantes: Fabian polo , Jose Torres, Oscar pallares
+Compilador usado: visual studio code
+Descripción: 3.4.7.1. Caudalímetro
+Desarrollar un programa que permita dar solución al siguiente problema:
+
+En un proyecto de telemetría se tiene un caudalímetro que envía por puerto serial cada periodo de tiempo la cantidad de caudal detectado, el cual es un número entero no mayor de 2 dígitos (es decir, se enviará un número entre 00 y 99)
+
+El caudalímetro envía la información en el siguiente formato:
+
+{'caudal': VALOR}
+Donde VALOR es el número que va entre 00 y 99. Una vez se recibe la información al microcontrolador, se debe imprimir por serial la siguiente información en el formato indicado:
+
+{'último': ULTIMO, 'mayor': MAYOR, 'menor': MENOR, 'promedio': PROMEDIO}
+Donde:
+
+ULTIMO es el último número recibido.
+MAYOR es el número mayor recibido.
+MENOR es el número mínimo recibido.
+PROMEDIO es el promedio de todos los números recibidos.
+Un ejemplo de este programa es el siguiente:
+
+{'último': 10, 'mayor': 10, 'menor': 10, 'promedio': 10.00}
+{'último': 1, 'mayor': 10, 'menor': 1, 'promedio': 5.50}
+{'último': 27, 'mayor': 27, 'menor': 1, 'promedio': 12.67}
+En el anterior ejemplo, el caudalímetro usando el formato {'caudal': VALOR} ha enviado por serial 3 números en orden que son 10, 1 y 27. Donde al recibir el tercer dato (27), el número menor en ese momento es 1, el número mayor es 10, el último número recibido es 27 y el promedio de la sumatoria de todos los números recibidos es (10 + 1 + 27)/3 = 12.667
+
+Restricciones:
+
+Si se recibe algo diferente entre 00 y 99 (sea número o letra) se debe ignorar.
+Si se envía algo diferente al formato {'caudal': VALOR}, se debe ignorar.
+*/
+
 #include <Arduino.h>
 #include <vector>
 #include <algorithm>
