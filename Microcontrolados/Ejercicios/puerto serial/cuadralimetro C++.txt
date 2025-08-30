@@ -1,0 +1,69 @@
+/*
+Ejercicio  - Sistemas Embebidos 1
+Integrantes: Fabian polo , Jose Torres, Oscar pallares
+Compilador usado: visual studio code
+Descripción: Se puede calcular el cuadrado de un número N al sumar los primeros N números impares.
+
+Con esta lógica, el cuadrado del número 7 es la sumatoria de los primeros 7 números impares, es decir 1+3+7+8+9+11+13=49
+
+Describir una solución para el microcontrolador que calcule el cuadrado de un número recibido por puerto serial e imprima el resultado por puerto serial.
+
+Si se recibe algo diferente a un número entero positivo mayor a cero se debe ignorar.
+*/
+
+#include <Arduino.h>
+
+long calcularCuadrado(int n) {
+    long suma = 0;
+    int impar = 1;  // primer número impar
+    for (int i = 0; i < n; i++) {
+        suma += impar;
+        impar += 2; // siguiente impar
+    }
+    return suma;
+}
+
+void setup() {
+    Serial.begin(115200);
+    Serial.println("Ingrese un número entero positivo:");
+}
+
+void loop() {
+    static String buffer = "";
+
+    while (Serial.available() > 0) {
+        char c = Serial.read();
+
+        if (c == '\n' || c == '\r') {
+            if (buffer.length() > 0) {
+                // validar si es número entero positivo
+                bool valido = true;
+                for (size_t i = 0; i < buffer.length(); i++) {
+                    if (!isDigit(buffer[i])) {
+                        valido = false;
+                        break;
+                    }
+                }
+
+                if (valido) {
+                    int n = buffer.toInt();
+                    if (n > 0) {
+                        long resultado = calcularCuadrado(n);
+                        Serial.print("El cuadrado de ");
+                        Serial.print(n);
+                        Serial.print(" es: ");
+                        Serial.println(resultado);
+                    } else {
+                        Serial.println("Entrada no válida (debe ser mayor que cero).");
+                    }
+                } else {
+                    Serial.println("Entrada ignorada (no es un número entero positivo).");
+                }
+
+                buffer = ""; // limpiar buffer
+            }
+        } else {
+            buffer += c; // acumular caracteres
+        }
+    }
+}

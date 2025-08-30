@@ -1,0 +1,70 @@
+/*
+Ejercicio  - Sistemas Embebidos 1
+Integrantes: Fabian polo , Jose Torres, Oscar pallares
+Compilador usado: visual studio code
+Descripción: Se puede calcular el cuadrado de un número N al sumar los primeros N números impares.
+
+Con esta lógica, el cuadrado del número 7 es la sumatoria de los primeros 7 números impares, es decir 1+3+7+8+9+11+13=49
+
+Describir una solución para el microcontrolador que calcule el cuadrado de un número recibido por puerto serial e imprima el resultado por puerto serial.
+
+Si se recibe algo diferente a un número entero positivo mayor a cero se debe ignorar.
+*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "driver/uart.h"
+
+#define UART_PORT UART_NUM_0   // Usamos el puerto UART0 (Serial por defecto)
+#define BUF_SIZE 1024
+
+// Función para calcular el cuadrado sumando los primeros N impares
+int cuadrado_por_impares(int n) {
+    int suma = 0;
+    int impar = 1;
+    for (int i = 0; i < n; i++) {
+        suma += impar;
+        impar += 2;
+    }
+    return suma;
+}
+
+void app_main() {
+    // Configuración UART (Serial)
+    uart_config_t uart_config = {
+        .baud_rate = 115200,
+        .data_bits = UART_DATA_8_BITS,
+        .parity    = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
+    };
+    uart_param_config(UART_PORT, &uart_config);
+    uart_driver_install(UART_PORT, BUF_SIZE, 0, 0, NULL, 0);
+
+    uint8_t data[BUF_SIZE];
+
+    while (1) {
+        // Leer desde puerto serial
+        int len = uart_read_bytes(UART_PORT, data, BUF_SIZE - 1, 20 / portTICK_PERIOD_MS);
+
+        if (len > 0) {
+            data[len] = '\0';  // Terminar la cadena recibida
+
+            int n = atoi((char*)data);  // Convertir a número entero
+
+            if (n > 0) {
+                int resultado = cuadrado_por_impares(n);
+                char msg[64];
+                sprintf(msg, "El cuadrado de %d es: %d\n", n, resultado);
+                uart_write_bytes(UART_PORT, msg, strlen(msg));
+            } else {
+                // Ignorar si no es un entero positivo
+                uart_write_bytes(UART_PORT, "Dato invalido\n", 14);
+            }
+        }
+
+        vTaskDelay(100 / portTICK_PERIOD_MS); // Pequeño retardo
+    }
+}
