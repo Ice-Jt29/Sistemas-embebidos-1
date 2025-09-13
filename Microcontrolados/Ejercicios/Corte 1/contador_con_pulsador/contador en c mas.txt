@@ -1,0 +1,87 @@
+#include <Arduino.h>
+
+#define BTN_INC  34   // Pulsador incremento
+#define BTN_DEC  35   // Pulsador decremento
+#define LED_PIN   33   // LED integrado ESP32 o externo
+
+#define PASO      1   
+#define MAX_VAL  20
+#define MIN_VAL   0
+
+int CONTEO = 0;
+
+// Estados anteriores
+int prevIncState = HIGH;
+int prevDecState = HIGH;
+
+// Variables LED temporizado
+bool ledActive = false;
+unsigned long ledOnTime = 0;
+
+// --- Función de lectura con anti-rebote por estabilidad ---
+bool readButtonDebounced(int pin, int &prevState) {
+  static unsigned long lastChangeTimeInc = 0;
+  static unsigned long lastChangeTimeDec = 0;
+
+  unsigned long now = millis();
+  int currState = digitalRead(pin);
+
+  // Selecciona cuál temporizador usar
+  unsigned long &lastChangeTime = (pin == BTN_INC) ? lastChangeTimeInc : lastChangeTimeDec;
+
+  if (currState != prevState) {
+    // Hubo cambio → esperar estabilidad
+    if (now - lastChangeTime > 30) {  // 30ms debounce
+      if (prevState == LOW && currState == HIGH) {
+        prevState = currState;
+        lastChangeTime = now;
+        return true; // Flanco positivo válido
+      }
+      prevState = currState;
+      lastChangeTime = now;
+    }
+  }
+  return false;
+}
+
+void setup() {
+  pinMode(BTN_INC, INPUT_PULLUP);
+  pinMode(BTN_DEC, INPUT_PULLUP);
+  pinMode(LED_PIN, OUTPUT);
+
+  Serial.begin(115200);
+}
+
+void loop() {
+  // --- Incremento ---
+  if (readButtonDebounced(BTN_INC, prevIncState)) {
+    if (CONTEO <= MAX_VAL - PASO) {
+      CONTEO += PASO;
+    } else {
+      CONTEO = MAX_VAL;
+    }
+    Serial.printf("{\"contador\": %d}\n", CONTEO);
+  }
+
+  // --- Decremento ---
+  if (readButtonDebounced(BTN_DEC, prevDecState)) {
+    if (CONTEO >= MIN_VAL + PASO) {
+      CONTEO -= PASO;
+    } else {
+      CONTEO = MIN_VAL;
+    }
+    Serial.printf("{\"contador\": %d}\n", CONTEO);
+  }
+
+  // --- Control LED ---
+  if (CONTEO == 10 && !ledActive) {
+    digitalWrite(LED_PIN, HIGH);
+    ledOnTime = millis();
+    ledActive = true;
+  }
+
+  if (ledActive && millis() - ledOnTime >= 4000) {
+    digitalWrite(LED_PIN, LOW);
+    ledActive = false;
+  }
+}
